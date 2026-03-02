@@ -1,0 +1,14 @@
+{
+    "name": "proto_import_prefix",
+    "private": true,
+    "packageManager": "pnpm@10.20.0",
+    "dependencies": {
+        "@bufbuild/protobuf": "2.11.0"
+    },
+    "devDependencies": {
+        "@bufbuild/protoc-gen-es": "2.11.0"
+    },
+    "pnpm": {
+        "onlyBuiltDependencies": []
+    }
+}

@@ -1,0 +1,12 @@
+load("@protobuf//bazel:proto_library.bzl", "proto_library")
+
+proto_library(
+    name = "logger_proto",
+    srcs = ["logger.proto"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//proto/stripping:s_proto",
+        "@protobuf//:any_proto",
+        "@protobuf//:timestamp_proto",
+    ],
+)

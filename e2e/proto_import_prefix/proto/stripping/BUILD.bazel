@@ -1,0 +1,9 @@
+load("@protobuf//bazel:proto_library.bzl", "proto_library")
+
+proto_library(
+    name = "s_proto",
+    srcs = ["s.proto"],
+    import_prefix = "post-stripped",
+    strip_import_prefix = "/proto",
+    visibility = ["//visibility:public"],
+)

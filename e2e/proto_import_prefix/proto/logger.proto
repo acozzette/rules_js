@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package logger;
+
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+import "post-stripped/stripping/s.proto";
+
+message LogMessage {
+  string message = 1;
+  google.protobuf.Timestamp time = 2;
+  google.protobuf.Any details = 3;
+  proto_import_prefix.stripping.Empty empty = 5;
+}
+
+message Empty {}
