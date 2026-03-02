@@ -22,8 +22,40 @@ load(":proto_common.bzl", "proto_common")
 LANG_PROTO_TOOLCHAIN = Label("//js/toolchains:protoc_plugin")
 PROTOC_TOOLCHAIN = Label("@protobuf//bazel/private:proto_toolchain_type")
 
+ImportRewriteInfo = provider(
+    "Information needed to account for generated files placed under the _virtual_imports subdirectory, which happens when import_prefix or strip_import_prefix is used on a proto_library target.",
+    fields = {
+        "rewrites": "Import rewrites to pass via the rewrite_imports flag to protoc-gen-es",
+    },
+)
+
+def _original_import(canonical_path):
+    return "./" + canonical_path.replace(".proto", "_pb.js")
+
+def _replacement(package, name):
+    return "./" + package + "/_virtual_imports/" + name
+
+def _import_rewrite_aspect_impl(_target, ctx):
+    rewrites = []
+    for dep in ctx.rule.attr.deps:
+        proto_source_root = dep[ProtoInfo].proto_source_root
+        if proto_source_root.find("/_virtual_imports/") != -1:
+            for source in dep[ProtoInfo].direct_sources:
+                canonical_path = source.path.removeprefix(proto_source_root)[1:]
+                rewrites.append(_original_import(canonical_path) + ":" + _replacement(dep.label.package, dep.label.name))
+    return [
+        ImportRewriteInfo(rewrites = rewrites),
+    ]
+
+_import_rewrite_aspect = aspect(
+    implementation = _import_rewrite_aspect_impl,
+    attr_aspects = ["deps"],
+    required_providers = [ProtoInfo],
+)
+
 def _js_proto_aspect_impl(target, ctx):
     proto_info = target[ProtoInfo]
+    import_rewrite_info = target[ImportRewriteInfo]
     protoc_info = ctx.toolchains[PROTOC_TOOLCHAIN].proto
     proto_lang_toolchain_info = ctx.toolchains[LANG_PROTO_TOOLCHAIN].proto
     js_proto_toolchain_info = ctx.toolchains[LANG_PROTO_TOOLCHAIN].js
@@ -60,6 +92,10 @@ def _js_proto_aspect_impl(target, ctx):
     args.add_all(proto_info.transitive_proto_path, map_each = proto_common.import_main_output_proto_path)
     args.add("-I.")  # Needs to come last
 
+    if proto_lang_toolchain_info.plugin_format_flag.startswith("--plugin=protoc-gen-es="):
+        for rewrite in import_rewrite_info.rewrites:
+            args.add("--es_opt=rewrite_imports=" + rewrite)
+
     args.add_all(proto_info.direct_sources)
 
     ctx.actions.run(
@@ -93,6 +129,7 @@ js_proto_aspect = aspect(
     # Only visit nodes that produce a ProtoInfo provider
     required_providers = [ProtoInfo],
     # Be a valid dependency of a ts_project rule
+    requires = [_import_rewrite_aspect],
     provides = [JsInfo],
     toolchains = [
         LANG_PROTO_TOOLCHAIN,
