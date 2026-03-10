@@ -1,7 +1,10 @@
 syntax = "proto3";
 
+import "protobuf/s.proto";
+
 package logger;
 
 message LogMessage {
   string message = 1;
+  empty.Empty empty = 2;
 }

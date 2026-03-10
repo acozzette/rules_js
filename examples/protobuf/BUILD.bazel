@@ -5,6 +5,14 @@ proto_library(
     name = "logger_proto",
     srcs = ["logger.proto"],
     visibility = ["//visibility:public"],
+    deps = [":s_proto"],
+)
+
+proto_library(
+    name = "s_proto",
+    srcs = ["s.proto"],
+    strip_import_prefix = "/examples",
+    visibility = ["//visibility:public"],
 )
 
 # We define a flag here for determinining which JS protobuf implementation

@@ -7,6 +7,7 @@ js_library(
     tags = ["manual"],
     deps = [
         "//examples/protobuf:logger_proto",
+        "//examples/protobuf:s_proto",
     ],
 )
 
