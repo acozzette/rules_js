@@ -325,6 +325,21 @@ if [ ! -f "$JS_BINARY__NODE_PATCHES" ]; then
     exit 1
 fi
 
+logf_error "Before: $(find .)"
+
+for virtual_imports_dir in "$(find . -type d -name _virtual_imports)"; do
+    logf_error "virtual_imports_dir: $virtual_imports_dir"
+    logf_error "$(find $virtual_imports_dir)"
+    if find "$virtual_imports_dir" | grep -q '_pb\.js$'; then
+        logf_error "Moving stuff"
+        for subdir in "$virtual_imports_dir"/*; do
+            mv "$subdir"/* .
+        done
+    fi
+done
+
+logf_error "After: $(find .)"
+
 # Change directory to user specified package if set
 if [ "${JS_BINARY__CHDIR:-}" ]; then
     logf_debug "changing directory to user specified package %s" "$JS_BINARY__CHDIR"
