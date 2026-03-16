@@ -37,6 +37,10 @@ gen_es.protoc_gen_es_binary(
 
 js_proto_toolchain(
     name = "protobuf_es_toolchain",
+    output_file_extensions = [
+        "_pb.js",
+        "_pb.d.ts",
+    ],
     plugin_bin = ":protoc_gen_es",
     plugin_name = "es",
     # See https://github.com/connectrpc/connect-es/blob/main/MIGRATING.md#update-plugin-options
