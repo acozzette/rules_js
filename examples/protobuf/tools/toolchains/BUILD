@@ -1,15 +1,13 @@
 """
-This file defines four JavaScript and TypeScript toolchains, specifically the
-ones for which Buf provides an SDK:
+This file defines two JavaScript protobuf toolchains. Ideally we would like to
+support all the JS and TS implementations for which Buf provides an SDK:
 https://buf.build/bazel/bazel/sdks/main:protobuf
 """
 
 load("@aspect_rules_js//js:proto.bzl", "js_proto_toolchain")
 load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
-load("@npm//:ts-proto/package_json.bzl", ts_proto = "bin")
 load("@npm//tools:@bufbuild/protoc-gen-es/package_json.bzl", gen_es = "bin")
 load("@npm//tools:@connectrpc/protoc-gen-connect-query/package_json.bzl", gen_connect_query = "bin")
-load("@npm//tools:@protobuf-ts/plugin/package_json.bzl", protobuf_ts = "bin")
 
 # We define a flag here for determinining which JS protobuf implementation
 # should be used. The js_proto_transition_library() rule uses a transition to
@@ -19,9 +17,7 @@ string_flag(
     build_setting_default = "protobuf_es",
     values = [
         "protobuf_es",
-        "ts_proto",
         "google_protobuf",
-        "protobuf_ts",
     ],
 )
 
@@ -56,30 +52,6 @@ js_proto_toolchain(
     target_settings = [":protobuf_es"],
 )
 
-###################
-# stephenh-ts-proto
-# https://github.com/stephenh/ts-proto
-config_setting(
-    name = "ts_proto",
-    flag_values = {
-        ":js_proto_implementation": "ts_proto",
-    },
-)
-
-ts_proto.protoc_gen_ts_proto_binary(
-    name = "protoc_gen_ts_proto",
-)
-
-js_proto_toolchain(
-    name = "ts_proto_toolchain",
-    output_file_extensions = [".ts"],
-    plugin_bin = ":protoc_gen_ts_proto",
-    plugin_name = "ts_proto",
-    plugin_options = ["importSuffix=.js"],
-    runtime = "//:node_modules/@bufbuild/protobuf",
-    target_settings = [":ts_proto"],
-)
-
 #################
 # google-protobuf
 # https://github.com/protocolbuffers/protobuf-javascript
@@ -103,33 +75,6 @@ js_proto_toolchain(
     ],
     runtime = "//:node_modules/google-protobuf",
     target_settings = [":google_protobuf"],
-)
-
-#######################
-# timostamm-protobuf-ts
-# https://github.com/timostamm/protobuf-ts
-config_setting(
-    name = "protobuf_ts",
-    flag_values = {
-        ":js_proto_implementation": "protobuf_ts",
-    },
-)
-
-protobuf_ts.protoc_gen_ts_binary(
-    name = "protoc_gen_ts",
-)
-
-js_proto_toolchain(
-    name = "protoc_gen_ts_toolchain",
-    output_file_extensions = [
-        ".js",
-        ".d.ts",
-    ],
-    plugin_bin = ":protoc_gen_ts",
-    plugin_name = "ts",
-    plugin_options = ["output_javascript"],
-    runtime = "//:node_modules/@protobuf-ts/runtime",
-    target_settings = [":protobuf_ts"],
 )
 
 # FIXME: wire this up to another toolchain_type symbol?
