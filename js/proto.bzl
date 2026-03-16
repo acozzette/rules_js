@@ -104,6 +104,9 @@ def js_proto_toolchain(name, plugin_name, plugin_options, plugin_bin, runtime, o
     """
     command_line_flags = ["--{}_opt=%s".format(plugin_name) % o for o in plugin_options]
     command_line_flags.append("--{}_out=$(OUT)".format(plugin_name))
+    for extension in output_file_extensions:
+        if extension.endswith(".ts") and not extension.endswith(".d.ts"):
+            fail("Pure-TypeScript protobuf implementations are not currently supported")
     _js_proto_toolchain(
         name = name,
         command_line = " ".join(command_line_flags),
