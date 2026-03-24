@@ -1,4 +1,4 @@
-import pkg from '../user_pb.js'
+import pkg from './user_pb.js'
 const { User } = pkg
 import assert from 'node:assert'
 

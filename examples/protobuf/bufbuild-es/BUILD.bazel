@@ -1,12 +1,34 @@
 load("@aspect_rules_js//js:defs.bzl", "js_library", "js_test")
+load("@protobuf//bazel:proto_library.bzl", "proto_library")
 load("//:js_proto_transition_library.bzl", "js_proto_transition_library")
+
+proto_library(
+    name = "status_proto",
+    srcs = [
+        "status.proto",
+    ],
+    # The use of strip_import_prefix is not recommended, but we do it here just
+    # to show how to make it work.
+    strip_import_prefix = "/bufbuild-es",
+    visibility = ["//:__subpackages__"],
+    deps = ["@protobuf//:timestamp_proto"],
+)
+
+proto_library(
+    name = "user_proto",
+    srcs = [
+        "user.proto",
+    ],
+    deps = [":status_proto"],
+)
 
 js_library(
     name = "test_lib",
     srcs = ["test_proto.js"],
     tags = ["manual"],
     deps = [
-        "//:foo_proto",
+        ":status_proto",
+        ":user_proto",
     ],
 )
 
