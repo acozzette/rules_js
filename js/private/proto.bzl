@@ -55,7 +55,6 @@ _import_rewrite_aspect = aspect(
 
 def _js_proto_aspect_impl(target, ctx):
     proto_info = target[ProtoInfo]
-    import_rewrite_info = target[ImportRewriteInfo]
     protoc_info = ctx.toolchains[PROTOC_TOOLCHAIN].proto
     proto_lang_toolchain_info = ctx.toolchains[LANG_PROTO_TOOLCHAIN].proto
     js_proto_toolchain_info = ctx.toolchains[LANG_PROTO_TOOLCHAIN].js
@@ -92,7 +91,12 @@ def _js_proto_aspect_impl(target, ctx):
     args.add_all(proto_info.transitive_proto_path, map_each = proto_common.import_main_output_proto_path)
     args.add("-I.")  # Needs to come last
 
+    # Tell the plugin how to fix up imports to account for any usage of
+    # import_prefix or strip_import_prefix on dependencies. For now we only do
+    # this with protoc-gen-es, but ideally we should generalize this logic to
+    # accommodate other plugins.
     if proto_lang_toolchain_info.plugin_format_flag.startswith("--plugin=protoc-gen-es="):
+        import_rewrite_info = target[ImportRewriteInfo]
         for rewrite in import_rewrite_info.rewrites:
             args.add("--es_opt=rewrite_imports=" + rewrite)
 
