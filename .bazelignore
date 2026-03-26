@@ -21,8 +21,6 @@ examples/npm_package/packages/pkg_d/node_modules/
 examples/npm_package/packages/pkg_e/node_modules/
 examples/runfiles/node_modules
 examples/stack_traces/node_modules
-examples/protobuf/node_modules
-examples/protobuf/tools/node_modules
 examples/vite3/node_modules
 examples/vite6/node_modules
 examples/webpack_cli/node_modules/

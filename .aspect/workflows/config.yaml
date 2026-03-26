@@ -147,7 +147,10 @@ workspaces:
     # e2e/update_pnpm_lock_with_import:
     # e2e/webpack_devserver:
     # e2e/webpack_devserver_esm:
-    examples/protobuf:
+    examples/protobuf/bufbuild-es:
+        icon: protobuf
+        tasks: *e2e_tasks
+    examples/protobuf/google-protobuf:
         icon: protobuf
         tasks: *e2e_tasks
 bazel:
