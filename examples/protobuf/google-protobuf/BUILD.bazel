@@ -10,14 +10,12 @@ proto_library(
         "status.proto",
         "user.proto",
     ],
-    visibility = ["//:__subpackages__"],
     deps = ["@protobuf//:timestamp_proto"],
 )
 
 js_library(
     name = "test_lib",
     srcs = ["test_proto.js"],
-    tags = ["manual"],
     deps = [
         "//:foo_proto",
     ],
