@@ -15,6 +15,7 @@ proto_library(
 
 js_library(
     name = "test_lib",
+    # This edge runs an aspect to produce a JsInfo provider with protobuf .js/.d.ts files.
     srcs = ["test_proto.js"],
     deps = [
         ":foo_proto",
