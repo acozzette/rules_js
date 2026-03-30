@@ -148,10 +148,10 @@ workspaces:
     # e2e/webpack_devserver:
     # e2e/webpack_devserver_esm:
     examples/protobuf/bufbuild-es:
-        icon: protobuf
+        icon: proto
         tasks: *e2e_tasks
     examples/protobuf/google-protobuf:
-        icon: protobuf
+        icon: proto
         tasks: *e2e_tasks
 bazel:
     flags:
