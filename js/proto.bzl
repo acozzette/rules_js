@@ -18,7 +18,7 @@ gen_es.protoc_gen_es_binary(name = "protoc_gen_es")
 3. Define a `js_proto_toolchain` that uses the plugin. See the rule documentation below.
 4. Update `MODULE.bazel` to register it, typically with a simple statement like `register_toolchains("//tools/toolchains:all")`
 
-See the examples under examples/protobuf/ for how to set up the toolchain for various code generator plugins.
+See the protobuf examples under e2e/ for how to set up the toolchain for various code generator plugins.
 
 ### Usage
 

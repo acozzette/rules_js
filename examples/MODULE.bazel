@@ -8,6 +8,7 @@ local_path_override(
 
 bazel_dep(name = "bazel_lib", version = "3.0.0", dev_dependency = True)
 bazel_dep(name = "bazel_skylib", version = "1.5.0", dev_dependency = True)
+bazel_dep(name = "jq.bzl", version = "0.4.0", dev_dependency = True)
 bazel_dep(name = "platforms", version = "1.0.0", dev_dependency = True)
 bazel_dep(name = "rules_nodejs", version = "6.7.3", dev_dependency = True)
 bazel_dep(name = "rules_shell", version = "0.6.1", dev_dependency = True)
@@ -64,6 +65,7 @@ npm.npm_translate_lock(
         "//npm_package/packages/pkg_b:package.json",
         "//npm_package/packages/pkg_d:package.json",
         "//npm_package/packages/pkg_e:package.json",
+        "//package_json_module:package.json",
         "//runfiles:package.json",
         "//stack_traces:package.json",
         "//vite3:package.json",

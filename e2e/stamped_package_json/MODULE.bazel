@@ -1,7 +1,0 @@
-bazel_dep(name = "aspect_rules_js", version = "0.0.0", dev_dependency = True)
-local_path_override(
-    module_name = "aspect_rules_js",
-    path = "../..",
-)
-
-bazel_dep(name = "jq.bzl", version = "0.4.0", dev_dependency = True)

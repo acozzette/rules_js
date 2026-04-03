@@ -1,0 +1,8 @@
+{
+    "name": "@e2e/pkg",
+    "type": "module",
+    "private": true,
+    "exports": {
+        ".": "./index.mjs"
+    }
+}

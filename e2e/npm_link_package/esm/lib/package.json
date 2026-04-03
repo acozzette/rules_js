@@ -1,0 +1,8 @@
+{
+    "name": "@e2e/lib",
+    "type": "module",
+    "private": true,
+    "exports": {
+        ".": "./index.mjs"
+    }
+}
