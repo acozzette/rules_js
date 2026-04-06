@@ -16,7 +16,7 @@ load("//js/private:proto.bzl", "PROTOC_TOOLCHAIN")
 
 JsProtoToolchainInfo = provider(
     doc = "Information on how to invoke the JavaScript or TypeScript protoc plugin.",
-    fields = ["output_file_extensions"],
+    fields = ["out_dts_extension", "out_js_extension"],
 )
 
 def _js_proto_toolchain_impl(ctx):
@@ -51,7 +51,7 @@ def _js_proto_toolchain_impl(ctx):
     )
     return [
         DefaultInfo(files = depset(), runfiles = ctx.runfiles()),
-        platform_common.ToolchainInfo(proto = proto_lang_toolchain_info, js = JsProtoToolchainInfo(output_file_extensions = ctx.attr.output_file_extensions)),
+        platform_common.ToolchainInfo(proto = proto_lang_toolchain_info, js = JsProtoToolchainInfo(out_dts_extension = ctx.attr.out_dts_extension, out_js_extension = ctx.attr.out_js_extension)),
     ]
 
 js_proto_toolchain = rule(
@@ -104,11 +104,16 @@ This is used for .proto files that are already linked into proto runtimes, such 
 <code>any.proto</code>.""",
         ),
         "toolchain_type": attr.label(),
-        "output_file_extensions": attr.string_list(
+        "out_dts_extension": attr.string(
             doc = """
-Indicates the file extensions that the plugin is expected to produce. These are
-interpreted as the suffix that should replace ".proto" from the input file
-name.
+Indicates the .d.ts suffix that the plugin is expected to produce, interpreted
+as the suffix that should replace ".proto" from the input file name.
+""",
+        ),
+        "out_js_extension": attr.string(
+            doc = """
+Indicates the .js suffix that the plugin is expected to produce, interpreted as
+the suffix that should replace ".proto" from the input file name.
 """,
         ),
     },

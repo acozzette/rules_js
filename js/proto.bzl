@@ -47,7 +47,7 @@ The generator you setup earlier will be invoked automatically as an action to ge
 load("//js/private:js_proto_toolchain.bzl", _js_proto_toolchain = "js_proto_toolchain")
 load("//js/private:proto.bzl", "LANG_PROTO_TOOLCHAIN")
 
-def js_proto_toolchain(name, plugin_name, plugin_options, plugin_bin, runtime, output_file_extensions = ["_pb.js", "_pb.d.ts"], target_settings = [], exec_compatible_with = [], target_compatible_with = [], **kwargs):
+def js_proto_toolchain(name, plugin_name, plugin_options, plugin_bin, runtime, out_dts_extension = "_pb.d.ts", out_js_extension = "_pb.js", target_settings = [], exec_compatible_with = [], target_compatible_with = [], **kwargs):
     """Define a proto_lang_toolchain that uses the plugin.
 
     Example:
@@ -55,10 +55,8 @@ def js_proto_toolchain(name, plugin_name, plugin_options, plugin_bin, runtime, o
     ```starlark
     js_proto_toolchain(
         name = "gen_es_toolchain",
-        output_file_extensions = [
-            "_pb.js",
-            "_pb.d.ts",
-        ],
+        out_dts_extension = "_pb.d.ts",
+        out_js_extension = "_pb.js",
         plugin_bin = ":protoc_gen_es",
         plugin_name = "es",
         # See https://github.com/bufbuild/protobuf-es/tree/main/packages/protoc-gen-es#plugin-options
@@ -90,11 +88,10 @@ def js_proto_toolchain(name, plugin_name, plugin_options, plugin_bin, runtime, o
 
             Note that node module resolution requires the runtime to be in a parent folder of any package containing generated code.
 
-        output_file_extensions: The file extensions that the plugin is expected to produce.
+        out_dts_extension: The suffix that should replace ".proto" in determining the .d.ts output file name, or None if the plugin does not produce a type declaration file.
+        out_js_extension: The suffix that should replace ".proto" in determining the .js output file name.
 
-            These are interpreted as the suffix that should replace ".proto"
-            from the input file name. This parameter has a default value for
-            backward compatibility, but should be set explicitly.
+            Each of the two options above has a default value for backward compatibility, but should be set explicitly.
 
         target_settings: List of target config settings the toolchain is compatible with.
         exec_compatible_with: List of constraint_values that the target platform must be compatible with.
@@ -104,16 +101,16 @@ def js_proto_toolchain(name, plugin_name, plugin_options, plugin_bin, runtime, o
     """
     command_line_flags = ["--{}_opt=%s".format(plugin_name) % o for o in plugin_options]
     command_line_flags.append("--{}_out=$(OUT)".format(plugin_name))
-    for extension in output_file_extensions:
-        if extension.endswith(".ts") and not extension.endswith(".d.ts"):
-            fail("Pure-TypeScript protobuf implementations are not currently supported")
+    if out_js_extension.endswith(".ts"):
+        fail("Pure-TypeScript protobuf implementations are not currently supported")
     _js_proto_toolchain(
         name = name,
         command_line = " ".join(command_line_flags),
         plugin_format_flag = "--plugin=protoc-gen-{}=%s".format(plugin_name),
         toolchain_type = LANG_PROTO_TOOLCHAIN,
         plugin = plugin_bin,
-        output_file_extensions = output_file_extensions,
+        out_dts_extension = out_dts_extension,
+        out_js_extension = out_js_extension,
         runtime = runtime,
         **kwargs
     )
