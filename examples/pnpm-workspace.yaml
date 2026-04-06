@@ -1,6 +1,7 @@
 packages:
     - '*'
     - '!proto'
+    - '!stamped_package_json'
     - 'js_lib_pkg/*'
     - 'npm_package/libs/*'
     - 'npm_package/packages/*'

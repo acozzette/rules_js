@@ -1,0 +1,12 @@
+{
+    "private": "true",
+    "type": "module",
+    "pnpm": {
+        "onlyBuiltDependencies": [
+            "fsevents"
+        ]
+    },
+    "devDependencies": {
+        "mocha": "^10.2.0"
+    }
+}

@@ -44,9 +44,6 @@ workspaces:
     e2e/npm_link_package:
         icon: npm
         tasks: *e2e_tasks
-    e2e/npm_link_package-esm:
-        icon: npm
-        tasks: *e2e_tasks
     e2e/npm_link_package-rerooted:
         icon: npm
         tasks: *e2e_tasks
@@ -86,9 +83,6 @@ workspaces:
     e2e/npm_translate_yarn_lock:
         icon: yarn
         tasks: *e2e_tasks
-    e2e/package_json_module:
-        icon: npm
-        tasks: *e2e_tasks
     e2e/patch_from_repo:
         icon: npm
         tasks:
@@ -121,17 +115,17 @@ workspaces:
     e2e/pnpm_version:
         icon: pnpm
         tasks: *e2e_tasks
+    e2e/protobuf-es:
+        icon: proto
+        tasks: *e2e_tasks
+    e2e/protobuf-google:
+        icon: proto
+        tasks: *e2e_tasks
     e2e/repo_mapping:
         icon: js
         tasks: *e2e_tasks
     e2e/output_paths:
         icon: js
-        tasks: *e2e_tasks
-    e2e/runfiles:
-        icon: js
-        tasks: *e2e_tasks
-    e2e/stamped_package_json:
-        icon: npm
         tasks: *e2e_tasks
     e2e/vendored_node:
         icon: js
@@ -142,9 +136,6 @@ workspaces:
     e2e/verify_patches:
         icon: js
         tasks: *e2e_tasks
-    e2e/worker:
-        icon: js
-        tasks: *e2e_tasks
     # No test targets. Requires running test.sh.
     # e2e/update_pnpm_lock:
     # e2e/update_pnpm_lock_with_import:
@@ -152,12 +143,6 @@ workspaces:
     # e2e/webpack_devserver_esm:
     examples:
         icon: js
-        tasks: *e2e_tasks
-    examples/protobuf/bufbuild-es:
-        icon: proto
-        tasks: *e2e_tasks
-    examples/protobuf/google-protobuf:
-        icon: proto
         tasks: *e2e_tasks
 bazel:
     flags:
