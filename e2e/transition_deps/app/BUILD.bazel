@@ -1,0 +1,18 @@
+load("@aspect_rules_js//js:defs.bzl", "js_test")
+
+# Test that the correct variant of @e2e/greeter is linked based on the flag.
+#
+# Run with the default (release) variant:
+#   bazel test //app:variant_test
+#
+# Run with the debug variant:
+#   bazel test //app:variant_test --//flags:build_variant=debug
+js_test(
+    name = "variant_test",
+    data = ["//:node_modules/@e2e/greeter"],
+    entry_point = "test.js",
+    env = select({
+        "//flags:debug": {"EXPECTED_VARIANT": "debug"},
+        "//conditions:default": {"EXPECTED_VARIANT": "release"},
+    }),
+)

@@ -1,0 +1,12 @@
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+
+# Release variant of @e2e/greeter.
+# Selected by default (when --//flags:build_variant is unset or set to "release").
+js_library(
+    name = "pkg",
+    srcs = [
+        "index.js",
+        "package.json",
+    ],
+    visibility = ["//visibility:public"],
+)

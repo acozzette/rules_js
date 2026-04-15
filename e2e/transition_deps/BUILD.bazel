@@ -1,0 +1,25 @@
+"""Root BUILD file: links @e2e/greeter into node_modules.
+
+The src is chosen at analysis time based on the //flags:build_variant flag:
+
+    bazel test //app:variant_test                                # release (default)
+    bazel test //app:variant_test --//flags:build_variant=debug  # debug variant
+    bazel test //app:variant_test --//flags:build_variant=release
+
+Because we use npm_link_package() rather than npm_link_all_packages(), the
+src attribute is fully configurable via select() — something that
+npm_link_all_packages() does not support.
+"""
+
+load("@aspect_rules_js//npm:defs.bzl", "npm_link_package")
+
+# Link @e2e/greeter, switching between the debug and release implementations
+# depending on the //flags:build_variant string flag.
+npm_link_package(
+    name = "node_modules/@e2e/greeter",
+    src = select({
+        "//flags:debug": "//greeter/debug:pkg",
+        "//conditions:default": "//greeter/release:pkg",
+    }),
+    package = "@e2e/greeter",
+)

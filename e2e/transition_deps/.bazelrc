@@ -1,0 +1,5 @@
+import %workspace%/../../tools/preset.bazelrc
+import %workspace%/../e2e.bazelrc
+
+# Auto-update the bzlmod lock file rather than requiring it to be committed.
+common --lockfile_mode=update

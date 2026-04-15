@@ -1,0 +1,19 @@
+load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+
+# A flag that selects between the debug and release build variants.
+# Pass --//flags:build_variant=debug on the command line to activate debug mode.
+string_flag(
+    name = "build_variant",
+    build_setting_default = "release",
+    values = [
+        "debug",
+        "release",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "debug",
+    flag_values = {":build_variant": "debug"},
+    visibility = ["//visibility:public"],
+)

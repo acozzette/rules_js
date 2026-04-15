@@ -1,0 +1,12 @@
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+
+# Debug variant of @e2e/greeter.
+# Selected when --//flags:build_variant=debug is passed on the command line.
+js_library(
+    name = "pkg",
+    srcs = [
+        "index.js",
+        "package.json",
+    ],
+    visibility = ["//visibility:public"],
+)
