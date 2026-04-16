@@ -124,6 +124,7 @@ def _init_root_package(priv):
         fail(msg)
     priv["root_package"] = pnpm_lock_label.package
 
+################################################################################
 def _init_workspace(priv, rctx, is_windows):
     root_package_json = {}
 
@@ -133,6 +134,7 @@ def _init_workspace(priv, rctx, is_windows):
         root_package_json = json.decode(rctx.read(root_package_json_path))
 
     priv["pnpm_settings"] = root_package_json.get("pnpm", {})
+    priv["only_built_dependencies"] = _only_built_dependencies(priv)
 
     # Read settings from pnpm-workspace.yaml for pnpm v10+ (NOTE: pnpm 9-10+ has lockfile version 9).
     # Support scenario where pnpm-lock.yaml was never parsed and "lock_version" is not set.
@@ -147,6 +149,7 @@ def _init_workspace(priv, rctx, is_windows):
 
             if pnpm_workspace_settings:
                 priv["pnpm_settings"] = priv["pnpm_settings"] | pnpm_workspace_settings
+                priv["only_built_dependencies"] = _only_built_dependencies(priv)
 
         if workspace_parse_err != None:
             should_update = _should_update_pnpm_lock(priv)
@@ -238,9 +241,9 @@ ERROR: Implicitly using pnpm-workspace.yaml file `{pnpm_workspace}` since the `{
             _copy_input_file(priv, rctx, attr, workspace_path, str(rctx.path(rel_path)))
 
     # Read patches from pnpm-lock.yaml `patchedDependencies`
-    for patch_info in priv["pnpm_patched_dependencies"].values():
-        patch = patch_info.get("path")
-        rel_path = paths.normalize(paths.join(rel_dir, patch))
+    for name in priv["pnpm_patched_dependencies"]:
+        patch_path = _patch_path_for(priv, name)
+        rel_path = paths.normalize(paths.join(rel_dir, patch_path))
         workspace_path = paths.join(priv["src_root"], rel_path)
 
         if not _has_input_hash(priv, rel_path):
@@ -250,7 +253,7 @@ ERROR: Implicitly using pnpm-workspace.yaml file `{pnpm_workspace}` since the `{
                     package_json = priv["pnpm_root_package_json"],
                 )
                 fail(msg)
-            _copy_input_file(priv, rctx, attr, workspace_path, str(rctx.path(patch)))
+            _copy_input_file(priv, rctx, attr, workspace_path, str(rctx.path(patch_path)))
 
 ################################################################################
 def _rel_path(priv, p):
@@ -392,6 +395,11 @@ def _yaml_to_json(rctx, yaml_path, is_windows):
     host_yq = Label("@yq_{}//:yq{}".format(repo_utils.platform(rctx), ".exe" if is_windows else ""))
     yq_args = [
         rctx.path(host_yq),
+        "eval-all",
+        # Do a cross-document reduce that simply returns the last document.
+        # pnpm 11 and newer will produce a two-document YAML file in some
+        # situations, but the last document is the important one.
+        ". as $d ireduce (null; $d)",
         yaml_path,
         "-o=json",
     ]
@@ -448,6 +456,38 @@ def _should_update_pnpm_lock(priv):
     return priv["should_update_pnpm_lock"] and priv["src_root"] != None
 
 ################################################################################
+def _patch_path_for(priv, name):
+    """Returns the patch file path for a patchedDependency entry by name, or None if not found.
+
+    Handles both lockfile formats:
+    - pnpm <= 10: pnpm-lock.yaml stores a dict with 'path' and 'hash' keys
+    - pnpm 11+: pnpm-lock.yaml stores only a hash string; the path is in pnpm-workspace.yaml
+    """
+    patch_info = priv["pnpm_patched_dependencies"].get(name)
+    if patch_info == None:
+        return None
+
+    # pnpm <= 10
+    if type(patch_info) != "string":
+        return patch_info["path"]
+
+    # pnpm 11+
+    patch_path = priv["pnpm_settings"].get("patchedDependencies", {}).get(name)
+    if not patch_path:
+        fail("ERROR: patchedDependencies entry '{}' in pnpm-lock.yaml has no corresponding path in pnpm-workspace.yaml".format(name))
+    return patch_path
+
+################################################################################
+def _only_built_dependencies(priv):
+    # pnpm 11 replaced onlyBuiltDependencies (a list) with allowBuilds (a dict
+    # mapping package names to booleans). Support both.
+    pnpm_settings = priv["pnpm_settings"]
+    allow_builds = pnpm_settings.get("allowBuilds", None)
+    if allow_builds != None:
+        return [name for name, allowed in allow_builds.items() if allowed]
+    return pnpm_settings.get("onlyBuiltDependencies", None)
+
+################################################################################
 def _new(rctx, mod, attr):
     should_update_pnpm_lock = attr.update_pnpm_lock
     if rctx.getenv(RULES_JS_DISABLE_UPDATE_PNPM_LOCK_ENV):
@@ -470,6 +510,7 @@ def _new(rctx, mod, attr):
         "input_hashes": {},
         "npm_auth": {},
         "npm_registries": {},
+        "only_built_dependencies": None,
         "packages": {},
         "root_package": "",
         "pnpm_settings": {},
@@ -488,8 +529,9 @@ def _new(rctx, mod, attr):
         default_registry = lambda: priv["default_registry"],
         importers = lambda: priv["importers"],
         packages = lambda: priv["packages"],
-        pnpm_patched_dependencies = lambda: priv["pnpm_patched_dependencies"],
-        only_built_dependencies = lambda: priv["pnpm_settings"].get("onlyBuiltDependencies", None),
+        pnpm_patches = lambda: [_patch_path_for(priv, name) for name in priv["pnpm_patched_dependencies"]],
+        pnpm_patch_for = lambda name: _patch_path_for(priv, name),
+        only_built_dependencies = lambda: priv["only_built_dependencies"],
         npm_registries = lambda: priv["npm_registries"],
         npm_auth = lambda: priv["npm_auth"],
         root_package = lambda: priv["root_package"],
