@@ -105,13 +105,12 @@ def _compile(
 
     args.add_all(direct_sources)
 
-    output_root = generated_files[0].root
     actions.run(
         executable = protoc_info.proto_compiler.executable,
         arguments = [args],
         progress_message = progress_message,
         mnemonic = mnemonic,
-        env = {"BAZEL_BINDIR": output_root.path},
+        env = {"BAZEL_BINDIR": proto_lang_toolchain_info.plugin.executable.root.path},
         tools = [proto_lang_toolchain_info.plugin, protoc_info.proto_compiler],
         inputs = depset(direct_sources, transitive = [descriptor_sets]),
         outputs = generated_files,
