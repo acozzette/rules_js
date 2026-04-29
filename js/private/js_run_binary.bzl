@@ -294,8 +294,8 @@ def js_run_binary(
     }
 
     # Configure working directory to `chdir` is set
-    if chdir:
-        normalized_chdir = chdir
+    if chdir != None:
+        normalized_chdir = "." if chdir == "" else chdir
         repo = native.repo_name()
 
         # Normalize workspace-relative chdir for external repositories so callers can pass
