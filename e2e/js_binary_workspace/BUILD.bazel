@@ -1,10 +1,35 @@
 load("@aspect_rules_js//js:defs.bzl", "js_run_binary")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
 
 js_run_binary(
     name = "run_workspace_bin",
+    chdir = package_name(),
     stdout = "out.txt",
     tool = "@workspace//:bin",
+)
+
+# This generated shell script verifies that the contents of the file passed as
+# the first argument end with the output directory for this package.
+genrule(
+    name = "working_directory_test_sh",
+    outs = ["working_directory_test.sh"],
+    cmd = """cat > $@ << 'EOF'
+#!/usr/bin/env bash
+actual="$$1"
+expected="$(@D)"
+expected_len=$$(printf '%s\\n' "$$expected" | wc -c)
+diff -u <(tail -c "$$expected_len" "$$actual") <(printf '%s\\n' "$$expected")
+EOF""",
+)
+
+# Assert that the js_run_binary target above runs in this package's output
+# directory, overriding the chdir argument on the underlying js_binary.
+sh_test(
+    name = "js_run_binary_chdir_test",
+    srcs = [":working_directory_test.sh"],
+    args = ["$(rootpath :out.txt)"],
+    data = [":out.txt"],
 )
 
 build_test(
