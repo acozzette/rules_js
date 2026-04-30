@@ -108,10 +108,18 @@ function logf_debug {
 
 function resolve_execroot_bin_path {
     local short_path="$1"
+    local suffix
     if [[ "$short_path" == ../* ]]; then
-        echo "$JS_BINARY__EXECROOT/${BAZEL_BINDIR:-$JS_BINARY__BINDIR}/external/${short_path:3}"
+        suffix="external/${short_path:3}"
     else
-        echo "$JS_BINARY__EXECROOT/${BAZEL_BINDIR:-$JS_BINARY__BINDIR}/$short_path"
+        suffix="$short_path"
+    fi
+    local exec_path="$JS_BINARY__EXECROOT/$JS_BINARY__BINDIR/$suffix"
+    local target_path="$JS_BINARY__EXECROOT/${BAZEL_BINDIR:-$JS_BINARY__BINDIR}/$suffix"
+    if [ -e "$exec_path" ]; then
+        echo "$exec_path"
+    else
+        echo "$target_path"
     fi
 }
 

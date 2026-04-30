@@ -117,12 +117,12 @@ js_test(
 # TEST: js_test(data = js_run_binary(srcs)) ---------------
 js_run_binary(
     name = "run-write-srcs",
+    srcs = ["data.json"],
     outs = ["rb0.json"],
     args = [
-        "rb0.json",
-        "data.json",
+        "$(rootpath rb0.json)",
+        "$(rootpath data.json)",
     ],
-    chdir = package_name(),
     tool = ":write-js_library-srcs",
 )
 
@@ -142,12 +142,12 @@ js_test(
 # TEST: js_test(data = js_run_binary(srcs = js_library(srcs))) ----------------
 js_run_binary(
     name = "run-write-js_library-srcs",
+    srcs = ["data.json"],
     outs = ["rb1.json"],
     args = [
-        "rb1.json",
-        "data.json",
+        "$(rootpath rb1.json)",
+        "$(rootpath data.json)",
     ],
-    chdir = package_name(),
     tool = ":write-js_library-srcs",
 )
 
@@ -174,12 +174,12 @@ js_binary(
 
 js_run_binary(
     name = "run-write-js_library-data",
+    srcs = ["data.json"],
     outs = ["rb2.json"],
     args = [
-        "rb2.json",
-        "data.json",
+        "$(rootpath rb2.json)",
+        "$(rootpath data.json)",
     ],
-    chdir = package_name(),
     tool = ":write-js_library-data",
 )
 
@@ -199,12 +199,12 @@ js_test(
 # TEST: js_test(data = js_run_binary(srcs = genrule())) -----------------------
 js_run_binary(
     name = "run-write-generated",
+    srcs = ["data-generated.json"],
     outs = ["rb3.json"],
     args = [
-        "rb3.json",
-        "data-generated.json",
+        "$(rootpath rb3.json)",
+        "$(rootpath data-generated.json)",
     ],
-    chdir = package_name(),
     tool = ":write-genrule",
 )
 
@@ -224,12 +224,12 @@ js_test(
 # TEST: js_test(data = js_run_binary(srcs = genrule(srcs = filegroup))) -------
 js_run_binary(
     name = "run-write-generated-copied",
+    srcs = ["data-copied.json"],
     outs = ["rb4.json"],
     args = [
-        "rb4.json",
-        "data-copied.json",
+        "$(rootpath rb4.json)",
+        "$(rootpath data-copied.json)",
     ],
-    chdir = package_name(),
     tool = ":write-genrule-filegroup-srcs",
 )
 

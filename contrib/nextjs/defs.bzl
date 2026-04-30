@@ -202,6 +202,7 @@ def nextjs_build(name, config, srcs, next_js_binary, data = [], **kwargs):
         chdir = native.package_name(),
         mnemonic = "NextJs",
         progress_message = "Compile Next.js app %{label}",
+        hoist_runfiles_to_exec_cfg = False,
         **kwargs
     )
 
@@ -327,6 +328,7 @@ def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], **kwa
         chdir = native.package_name(),
         mnemonic = "NextJs",
         progress_message = "Compile Next.js standalone app %{label}",
+        hoist_runfiles_to_exec_cfg = False,
         **kwargs
     )
 
